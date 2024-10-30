@@ -5,5 +5,7 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(fruit_samurai main.c
         RenderWindow.h
-        RenderWindow.c)
+        RenderWindow.c
+        Entity.h
+        Entity.c)
 target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image)

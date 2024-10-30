@@ -4,6 +4,7 @@
 #include<stdbool.h>
 
 #include "RenderWindow.h"
+#include "Entity.h"
 
 int main(void)
 {
@@ -18,6 +19,8 @@ int main(void)
 	RenderWindow window;
 	RenderWindow_Init(&window, "Cheeki Breeki!", 800, 600);
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(&window, "res/textures/background.png");
+	Entity watermelon;
+	Entity_Init(&watermelon, 40, 40, backgroundTexture);
 
 	bool gameRunning = true;
 

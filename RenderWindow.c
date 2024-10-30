@@ -1,6 +1,6 @@
 #include"RenderWindow.h"
+#include"Entity.h"
 
-#include <SDL2/SDL_image.h>
 
 void RenderWindow_Init(RenderWindow* renderWindow, const char* title, const int width, const int height) {
 	renderWindow->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
@@ -29,7 +29,18 @@ void RenderWindow_clear(const RenderWindow* renderWindow) {
 }
 
 void RenderWindow_render(const RenderWindow* renderWindow, SDL_Texture* texture) {
-	SDL_RenderCopy(renderWindow->renderer, texture, NULL, NULL);
+	SDL_Rect src;
+	src.x = 0;
+	src.y = 0;
+	src.w = 32;
+	src.h = 32;
+
+	SDL_Rect dest;
+	dest.x = 0;
+	dest.y = 0;
+	dest.w = 32;
+	dest.h = 32;
+	SDL_RenderCopy(renderWindow->renderer, texture, &src, &dest);
 }
 
 void RenderWindow_display(const RenderWindow* renderWindow) {
