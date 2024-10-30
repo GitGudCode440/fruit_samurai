@@ -29,18 +29,7 @@ void RenderWindow_clear(const RenderWindow* renderWindow) {
 }
 
 void RenderWindow_render(const RenderWindow* renderWindow, SDL_Texture* texture) {
-	SDL_Rect src;
-	src.x = 0;
-	src.y = 0;
-	src.w = 32;
-	src.h = 32;
-
-	SDL_Rect dest;
-	dest.x = 0;
-	dest.y = 0;
-	dest.w = 32;
-	dest.h = 32;
-	SDL_RenderCopy(renderWindow->renderer, texture, &src, &dest);
+	SDL_RenderCopy(renderWindow->renderer, texture, NULL, NULL);
 }
 
 void RenderWindow_display(const RenderWindow* renderWindow) {

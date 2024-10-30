@@ -19,8 +19,11 @@ int main(void)
 	RenderWindow window;
 	RenderWindow_Init(&window, "Cheeki Breeki!", 800, 600);
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(&window, "res/textures/background.png");
+
+
+	SDL_Texture* watermelonTexture = RenderWindow_loadTexture(&window, "res/textures/watermelon.png");
 	Entity watermelon;
-	Entity_Init(&watermelon, 40, 40, backgroundTexture);
+	Entity_Init(&watermelon, 60, 60, 50, 417, watermelonTexture);
 
 	bool gameRunning = true;
 
@@ -30,9 +33,13 @@ int main(void)
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT)
 				gameRunning = false;
+
 		}
+
 		RenderWindow_clear(&window);
 		RenderWindow_render(&window, backgroundTexture);
+		Entity_applyGravity(&watermelon, 0.1);
+		Entity_render(&window, &watermelon);
 		RenderWindow_display(&window);
 
 	}
