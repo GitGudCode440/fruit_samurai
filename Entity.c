@@ -1,11 +1,18 @@
 #include "Entity.h"
 #include"RenderWindow.h"
 
-void Entity_Init(Entity *entity,
+Entity* Entity_Init(
 	const float x, const float y,
 	const int size, const int textureSize,  SDL_Texture* texture
 	)
 {
+	Entity* entity = malloc(sizeof(Entity));
+
+	if (entity == NULL) {
+		free(entity);
+		return NULL;
+	}
+
 	entity->x = x;
 	entity->y = y;
 	entity->viewRect.x = 0;
@@ -14,6 +21,8 @@ void Entity_Init(Entity *entity,
 	entity->viewRect.h = textureSize;
 	entity->size = size;
 	entity->texture = texture;
+
+	return entity;
 }
 
 void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
@@ -31,6 +40,6 @@ void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	SDL_RenderCopy(renderWindow->renderer, entity->texture, &src, &dest);
 }
 
-void Entity_applyGravity(Entity* entity, const float gravity) {
-	entity->y += gravity;
+void Entity_applyGravity(Entity* entity, const float gravity, double deltaTime) {
+	entity->y += gravity * (float) deltaTime;
 }

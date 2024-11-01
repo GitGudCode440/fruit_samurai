@@ -7,7 +7,7 @@ typedef struct {
 	SDL_Renderer* renderer;
 } RenderWindow;
 
-void RenderWindow_Init(RenderWindow* renderWindow, const char* title, int width, int height);
+RenderWindow* RenderWindow_Init(const char* title, int width, int height);
 void RenderWindow_Destroy(const RenderWindow* renderWindow);
 
 SDL_Texture* RenderWindow_loadTexture(const RenderWindow* renderWindow, const char* filepath);
