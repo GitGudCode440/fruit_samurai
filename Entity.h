@@ -11,5 +11,6 @@ typedef struct {
 } Entity;
 
 Entity* Entity_Init(float x, float y, int size, int textureSize, SDL_Texture* texture);
+
 void Entity_render(const RenderWindow* renderWindow, const Entity* entity);
 void Entity_applyGravity(Entity* entity, float gravity, double deltaTime);
