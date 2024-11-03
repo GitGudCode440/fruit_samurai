@@ -2,9 +2,14 @@
 #include<SDL2/SDL_image.h>
 #include<stdio.h>
 #include<stdbool.h>
+#include <time.h>
 
 #include "RenderWindow.h"
 #include "Entity.h"
+
+float randomFloat() {
+	return (float)rand() / (float)RAND_MAX;
+}
 
 int main(void)
 {
@@ -21,7 +26,7 @@ int main(void)
 
 
 
-	Entity* entities[4];
+	Entity* entities = malloc(sizeof(Entity) * 4);
 
 	{
 		SDL_Texture* textures[4] = {
@@ -31,15 +36,34 @@ int main(void)
 			RenderWindow_loadTexture(window, "res/textures/strawberry.png")
 		};
 
-
+		srand(time(NULL));
 		for(int i = 0; i < 4; i++) {
-			entities[i] = Entity_Init(200 * (float) i + 64, 40, 40, 450, textures[i]);
+			entities[i] = (Entity) {
+				.x = 200 * (float) i + 64,
+				.y = 800,
+				.size = 60,
+				.viewRect = {0, 0, 450, 450},
+				.texture = textures[i],
+				.initialVelocity = {randomFloat() / 10.0f, -1}
+			};
 		}
 	}
 
-
+	// SDL_Texture* cherryTexture = RenderWindow_loadTexture(window, "res/textures/cherry.png");
+	// const Entity cherry = (Entity) {
+	// 	.x = 200,
+	// 	.y = 400,
+	// 	.size = 40,
+	// 	.viewRect = {0, 0, 450, 450},
+	// 	.texture = cherryTexture
+	// };
+	//
+	// Entity_append(&entities, cherry, &entityAmount);
 	bool gameRunning = true;
 
+	/*	https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
+	*	Solution for calculating deltaTime which is the top answer.
+	*/
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
@@ -52,23 +76,28 @@ int main(void)
 				gameRunning = false;
 
 		}
+		uint32_t timeElapsed = SDL_GetTicks();
 
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 
-		deltaTime = (double) (NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency() ;
+
+		deltaTime = (double) ((NOW - LAST) * 1000) / (double) SDL_GetPerformanceFrequency() ;
 
 		RenderWindow_clear(window);
 		RenderWindow_render(window, backgroundTexture);
 		for(int i = 0; i < 4; i++) {
-			Entity_applyGravity(entities[i], 0.1f, deltaTime);
-			Entity_render(window, entities[i]);
+			Entity_applyVelocity(&entities[i], &deltaTime);
+			Entity_applyGravity(&entities[i], 0.00035f, &timeElapsed, &deltaTime);
+			Entity_render(window, &entities[i]);
+
 
 		}
 		RenderWindow_display(window);
 
 	}
 
+	free(entities);
 	RenderWindow_Destroy(window);
 
 	SDL_Quit();
