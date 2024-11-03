@@ -1,5 +1,4 @@
 #include"RenderWindow.h"
-#include"Entity.h"
 
 
 RenderWindow* RenderWindow_Init(const char* title, const int width, const int height) {
