@@ -1,28 +1,12 @@
 #include "Entity.h"
-#include"RenderWindow.h"
 
-Entity* Entity_Init(
-	const float x, const float y,
-	const int size, const int textureSize,  SDL_Texture* texture
-	)
-{
-	Entity* entity = malloc(sizeof(Entity));
 
-	if (entity == NULL) {
-		free(entity);
-		return NULL;
-	}
-
-	entity->x = x;
-	entity->y = y;
-	entity->viewRect.x = 0;
-	entity->viewRect.y = 0;
-	entity->viewRect.w = textureSize;
-	entity->viewRect.h = textureSize;
-	entity->size = size;
-	entity->texture = texture;
-
-	return entity;
+void Entity_append(Entity** entities, Entity entity, int* count) {
+	Entity* temp = realloc(*entities, sizeof(Entity) * (*count + 1));
+	if (temp == NULL) return;
+	*entities = temp;
+	(*entities)[*count] = entity;
+	(*count)++;
 }
 
 void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
@@ -40,6 +24,11 @@ void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	SDL_RenderCopy(renderWindow->renderer, entity->texture, &src, &dest);
 }
 
-void Entity_applyGravity(Entity* entity, const float gravity, double deltaTime) {
-	entity->y += gravity * (float) deltaTime;
+void Entity_applyGravity(Entity* entity, const float gravity, const uint32_t* time, const double* deltaTime) {
+	entity->y += gravity * (float) *time * (float) *deltaTime;
+}
+
+void Entity_applyVelocity(Entity* entity, const double* deltaTime) {
+	entity->x += entity->initialVelocity.x * (float) (*deltaTime);
+	entity->y += entity->initialVelocity.y * (float) (*deltaTime);
 }
