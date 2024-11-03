@@ -7,5 +7,7 @@ add_executable(fruit_samurai main.c
         RenderWindow.h
         RenderWindow.c
         Entity.h
-        Entity.c)
+        Entity.c
+        Vector2f.c
+        Vector2f.h)
 target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image)
