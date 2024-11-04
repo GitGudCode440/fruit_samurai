@@ -1,14 +1,6 @@
 #include "Entity.h"
 
 
-void Entity_append(Entity** entities, Entity entity, int* count) {
-	Entity* temp = realloc(*entities, sizeof(Entity) * (*count + 1));
-	if (temp == NULL) return;
-	*entities = temp;
-	(*entities)[*count] = entity;
-	(*count)++;
-}
-
 void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	SDL_Rect src;
 	src.x = entity->viewRect.x;
@@ -24,7 +16,7 @@ void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	SDL_RenderCopy(renderWindow->renderer, entity->texture, &src, &dest);
 }
 
-void Entity_applyGravity(Entity* entity, const float gravity, const uint32_t* time, const double* deltaTime) {
+void Entity_applyGravity(Entity* entity, const float gravity, const double* time, const double* deltaTime) {
 	entity->y += gravity * (float) *time * (float) *deltaTime;
 }
 

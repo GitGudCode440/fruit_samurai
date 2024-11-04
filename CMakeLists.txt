@@ -9,5 +9,7 @@ add_executable(fruit_samurai main.c
         Entity.h
         Entity.c
         Vector2f.c
-        Vector2f.h)
-target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image)
+        Vector2f.h
+        Utils.h
+        Utils.c)
+target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image -lSDL2_ttf)

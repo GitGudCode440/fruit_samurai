@@ -14,7 +14,7 @@ RenderWindow* RenderWindow_Init(const char* title, const int width, const int he
 		free(renderWindow);
 		return NULL;
 	}
-	renderWindow->renderer = SDL_CreateRenderer(renderWindow->window, -1, SDL_RENDERER_ACCELERATED);
+	renderWindow->renderer = SDL_CreateRenderer(renderWindow->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	if (!renderWindow->renderer) {
 		printf("Failed to create renderer: %s\n", SDL_GetError());
@@ -42,6 +42,7 @@ SDL_Texture* RenderWindow_loadTexture(const RenderWindow* renderWindow, const ch
 
 	return texture;
 }
+
 void RenderWindow_clear(const RenderWindow* renderWindow) {
 	SDL_RenderClear(renderWindow->renderer);
 }

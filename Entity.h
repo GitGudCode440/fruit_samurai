@@ -12,7 +12,6 @@ typedef struct {
 } Entity;
 
 
-void Entity_append(Entity** entities, Entity entity, int* count);
 void Entity_render(const RenderWindow* renderWindow, const Entity* entity);
-void Entity_applyGravity(Entity* entity, float gravity, const uint32_t* time, const double* deltaTime);
+void Entity_applyGravity(Entity* entity, float gravity, const double* time, const double* deltaTime);
 void Entity_applyVelocity(Entity* entity, const double* deltaTime);
