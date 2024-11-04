@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
 
 	//RenderWindow is a combination of a renderer, and a window.
-	//It is used to display things on the screen.
+	//RenderWindow.h also comes with functions that are helpful to display things on the screen.
 	RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", 800, 600);
 
 	//Wood background.
