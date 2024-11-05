@@ -1,5 +1,4 @@
 #include "Utils.h"
-#include<SDL2/SDL.h>
 
 float hireTimeInSeconds() {
 	float t = (float) SDL_GetTicks();
