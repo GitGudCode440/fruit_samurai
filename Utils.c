@@ -8,6 +8,5 @@ float hireTimeInSeconds() {
 }
 
 float randomFloat() {
-	srand(time(NULL));
 	return (float)rand() / (float)RAND_MAX;
 }

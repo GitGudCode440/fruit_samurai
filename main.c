@@ -46,6 +46,8 @@ int main(int argc, char* argv[])
 		};
 
 		//Initialize entity with required params, like position, size, etc.
+
+		srand(time(NULL));
 		for(int i = 0; i < 4; i++) {
 
 			entities[i] = (Entity) {
