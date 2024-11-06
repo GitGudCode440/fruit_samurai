@@ -11,7 +11,6 @@ RenderWindow* RenderWindow_Init(const char* title, const int width, const int he
 	renderWindow->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 	if (!renderWindow->window) {
 		printf("Failed to create window: %s\n", SDL_GetError());
-		free(renderWindow);
 		return NULL;
 	}
 	renderWindow->renderer = SDL_CreateRenderer(renderWindow->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -19,7 +18,6 @@ RenderWindow* RenderWindow_Init(const char* title, const int width, const int he
 	if (!renderWindow->renderer) {
 		printf("Failed to create renderer: %s\n", SDL_GetError());
 		SDL_DestroyWindow(renderWindow->window);
-		free(renderWindow);
 		return NULL;
 	}
 
@@ -41,6 +39,37 @@ SDL_Texture* RenderWindow_loadTexture(const RenderWindow* renderWindow, const ch
 	}
 
 	return texture;
+}
+
+RenderImage* RenderWindow_loadTextureFromFont(const RenderWindow* renderWindow, TTF_Font* font, const char* title, const SDL_Color color) {
+  SDL_Surface* textSurface = TTF_RenderText_Solid(font, title, color);
+
+	if (textSurface == NULL) {
+		printf("Failed to load text surface: %s\n", TTF_GetError());
+		return NULL;
+	}
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderWindow->renderer, textSurface);
+
+	if (texture == NULL) {
+		printf("Failed to get texture: %s\n", SDL_GetError());
+		return NULL;
+	}
+
+	RenderImage* fontImage = malloc(sizeof(RenderImage));
+
+	if (!fontImage) {
+		printf("Failed to allocate for RenderImage\n");
+		return NULL;
+	}
+
+	fontImage->texture = texture;
+	fontImage->width = textSurface->w;
+	fontImage->height = textSurface->h;
+
+
+	free(textSurface);
+	return fontImage;
 }
 
 void RenderWindow_clear(const RenderWindow* renderWindow) {

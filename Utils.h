@@ -6,3 +6,4 @@
 
 float hireTimeInSeconds();
 float randomFloat();
+const char* getRandomChar();

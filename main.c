@@ -8,6 +8,7 @@
 #include "Entity.h"
 #include "Utils.h"
 
+#define FONT_SIZE 32
 int main(int argc, char* argv[])
 {
 	//Initialize SDL, and SDL_image. SDL_image is for loading images.
@@ -15,28 +16,44 @@ int main(int argc, char* argv[])
 	//If Initializing SDL returns greater than 0, there is an error.
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		printf("SDL_Init failed: %s\n", SDL_GetError());
-		return -1;
+		return 1;
 	};
 
 	//If Initializing SDL_image does not exist, there is an error.
 	if(!IMG_Init(IMG_INIT_PNG)) {
 		printf("IMG_Init failed: %s\n", SDL_GetError());
-		return -1;
+		return 1;
 	};
+
+	if (TTF_Init() == -1) {
+		printf("TTF_Init failed: %s\n", SDL_GetError());
+		return 1;
+	}
 
 
 	//RenderWindow is a combination of a renderer, and a window.
 	//RenderWindow.h also comes with functions that are helpful to display things on the screen.
-	RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", 800, 600);
+	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", 800, 600);
 
 	//Wood background.
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 
+	TTF_Font* font = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
+	const SDL_Color color = {252, 255, 255, 255};
+
+	if (font == NULL) {
+		printf("Failed to load font: %s\n", TTF_GetError());
+		return 1;
+	}
+
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
 	Entity* entities = malloc(sizeof(Entity) * 4);
+	Entity* fontEntities = malloc(sizeof(Entity) * 4);
 
 	//Things initialized inside braces, only exist inside braces.
 	{
+		srand(time(NULL));
+
 		//Load texture for every fruit.
 		SDL_Texture* textures[4] = {
 			RenderWindow_loadTexture(window, "res/textures/watermelon.png"),
@@ -45,9 +62,19 @@ int main(int argc, char* argv[])
 			RenderWindow_loadTexture(window, "res/textures/strawberry.png")
 		};
 
+
+
+		RenderImage* fontTexture[4] = {
+			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
+			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
+			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
+			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color)
+		};
+
+
+
 		//Initialize entity with required params, like position, size, etc.
 
-		srand(time(NULL));
 		for(int i = 0; i < 4; i++) {
 
 			entities[i] = (Entity) {
@@ -58,6 +85,15 @@ int main(int argc, char* argv[])
 				.texture = textures[i],
 				.initialVelocity = {randomFloat() * 20, -360}
 			};
+			fontEntities[i] = (Entity) {
+				.x = entities[i].x + (float) entities[i].size / 2 - (float) FONT_SIZE / 2,
+				.y = entities[i].y + (float) entities[i].size / 2 - (float) FONT_SIZE / 2,
+				.size = FONT_SIZE,
+				.viewRect = {0, 0, fontTexture[i]->width, fontTexture[i]->height},
+				.texture = fontTexture[i]->texture,
+				.initialVelocity = entities[i].initialVelocity
+			};
+
 		}
 	}
 
@@ -93,8 +129,11 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < 4; i++) {
 				Entity_applyVelocity(&entities[i], &frameTime);
+				Entity_applyVelocity(&fontEntities[i], &frameTime);
 				Entity_applyGravity(&entities[i], 150, &t, &frameTime);
+				Entity_applyGravity(&fontEntities[i], 150, &t, &frameTime);
 				Entity_render(window, &entities[i]);
+				Entity_render(window, &fontEntities[i]);
 			}
 
 			accumulator -= stepTime;
@@ -105,8 +144,9 @@ int main(int argc, char* argv[])
 	}
 
 	free(entities);
+	free(fontEntities);
 	RenderWindow_Destroy(window);
-
+	TTF_Quit();
 	SDL_Quit();
 	return 0;
 }
