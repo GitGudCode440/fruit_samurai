@@ -1,6 +1,7 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
+#include<SDL2/SDL_mixer.h>
 #include<stdio.h>
 #include<stdbool.h>
 
@@ -21,7 +22,7 @@ int main(int argc, char* argv[])
 	//Initialize SDL, and SDL_image. SDL_image is for loading images.
 
 	//If Initializing SDL returns greater than 0, there is an error.
-	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) > 0) {
 		printf("SDL_Init failed: %s\n", SDL_GetError());
 		return 1;
 	};
@@ -34,6 +35,11 @@ int main(int argc, char* argv[])
 
 	if (TTF_Init() == -1) {
 		printf("TTF_Init failed: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
 		return 1;
 	}
 
@@ -57,6 +63,15 @@ int main(int argc, char* argv[])
 		printf("Failed to load font: %s\n", TTF_GetError());
 		return 1;
 	}
+
+	Mix_Music* backgroundMusic = Mix_LoadMUS("res/audio/Game-start.wav");
+
+	if (backgroundMusic == NULL) {
+		printf("Failed to load background music. Error: %s\n", Mix_GetError());
+	}
+
+	Mix_VolumeMusic(1);
+
 
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
 	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
@@ -126,6 +141,13 @@ int main(int argc, char* argv[])
 	bool gameRunning = true;
 
 
+	Mix_PlayMusic(backgroundMusic, 0);
+
+	while (Mix_PlayingMusic()) {}
+
+	Mix_FreeMusic(backgroundMusic);
+
+
 	SDL_Event event; //Input event.
 	double t = 0.0; // Time for how long the game has been open.
 	const double stepTime = 1.0f / 100.0f; // Step time is used for minimum time taken for game to update.
@@ -134,9 +156,9 @@ int main(int argc, char* argv[])
 	double accumulator = 0.0; // Used to execute statements until update according to frame time has been compensated.
 
 
-
 	//Game loop.
 	while (gameRunning) {
+
 		const double newTime = hireTimeInSeconds(); // Time taken for new frame.
 		const double frameTime = newTime - currentTime; //Used to keep motion same, in faster, and slower hardware.
 		currentTime = newTime;
@@ -176,6 +198,7 @@ int main(int argc, char* argv[])
 		}
 
 		RenderWindow_display(window);
+
 	}
 
 	free(entities);

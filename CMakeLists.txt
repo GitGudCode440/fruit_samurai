@@ -13,4 +13,4 @@ add_executable(fruit_samurai main.c
         Utils.h
         Utils.c
 )
-target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image -lSDL2_ttf)
+target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer)
