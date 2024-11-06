@@ -31,6 +31,9 @@ int main(int argc, char* argv[])
 	}
 
 
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
+
 	//RenderWindow is a combination of a renderer, and a window.
 	//RenderWindow.h also comes with functions that are helpful to display things on the screen.
 	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", 800, 600);
