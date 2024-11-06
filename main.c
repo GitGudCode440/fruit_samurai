@@ -61,9 +61,16 @@ int main(int argc, char* argv[])
 		//Load texture for every fruit.
 		SDL_Texture* textures[4] = {
 			RenderWindow_loadTexture(window, "res/textures/watermelon.png"),
-			RenderWindow_loadTexture(window, "res/textures/bananas.png"),
-			RenderWindow_loadTexture(window, "res/textures/cherry.png"),
+			RenderWindow_loadTexture(window, "res/textures/coconut.png"),
+			RenderWindow_loadTexture(window, "res/textures/peach.png"),
 			RenderWindow_loadTexture(window, "res/textures/strawberry.png")
+		};
+
+		SDL_Texture* slicedTexture[4] = {
+			RenderWindow_loadTexture(window, "res/textures/cut_watermelon.png"),
+			RenderWindow_loadTexture(window, "res/textures/cut_coconut.png"),
+			RenderWindow_loadTexture(window, "res/textures/cut_peach.png"),
+			RenderWindow_loadTexture(window,"res/textures/cut_strawberry.png"),
 		};
 
 
@@ -85,7 +92,8 @@ int main(int argc, char* argv[])
 				.position = {200 * (float) i, 800},
 				.size = {60, 60},
 				.viewRect = {0, 0, 450, 450},
-				.texture = textures[i],
+				.texture[UNSLICED] = textures[i],
+				.texture[SLICED] = slicedTexture[i],
 				.initialVelocity = {randomFloat() * 20, -360}
 			};
 			fontEntities[i] = (Entity) {
@@ -113,6 +121,8 @@ int main(int argc, char* argv[])
 	double accumulator = 0.0; // Used to execute statements until update according to frame time has been compensated.
 
 
+	int textureState = UNSLICED;
+
 	//Game loop.
 	while (gameRunning) {
 		const double newTime = hireTimeInSeconds(); // Time taken for new frame.
@@ -126,6 +136,15 @@ int main(int argc, char* argv[])
 			while (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT)
 					gameRunning = false;
+				else if (event.type = SDL_KEYDOWN) {
+					switch (event.key.keysym.sym) {
+						case SDLK_UP:
+							textureState = SLICED;
+							break;
+						default:
+							break;
+					}
+				}
 			}
 
 
@@ -137,8 +156,8 @@ int main(int argc, char* argv[])
 				Entity_applyVelocity(&fontEntities[i], &frameTime);
 				Entity_applyGravity(&entities[i], 150, &t, &frameTime);
 				Entity_applyGravity(&fontEntities[i], 150, &t, &frameTime);
-				Entity_render(window, &entities[i]);
-				Entity_render(window, &fontEntities[i]);
+				Entity_render(window, &entities[i], textureState);
+				Entity_render(window, &fontEntities[i], UNSLICED);
 			}
 
 			accumulator -= stepTime;
