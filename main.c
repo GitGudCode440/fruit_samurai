@@ -14,6 +14,7 @@
 #define ENTITY_AMOUNT 4
 #define FONT_SIZE 24
 #define INITIAL_UPWARD_VELOCITY (-360)
+#define GRAVITY 150
 
 int main(int argc, char* argv[])
 {
@@ -163,8 +164,8 @@ int main(int argc, char* argv[])
 			for(int i = 0; i < ENTITY_AMOUNT; i++) {
 				Entity_applyVelocity(&entities[i], &frameTime);
 				Entity_applyVelocity(&fontEntities[i], &frameTime);
-				Entity_applyGravity(&entities[i], 150, &t, &frameTime);
-				Entity_applyGravity(&fontEntities[i], 150, &t, &frameTime);
+				Entity_applyGravity(&entities[i], GRAVITY, &t, &frameTime);
+				Entity_applyGravity(&fontEntities[i], GRAVITY, &t, &frameTime);
 				Entity_render(window, &entities[i]);
 				Entity_render(window, &fontEntities[i]);
 			}
