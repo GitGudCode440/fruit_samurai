@@ -8,7 +8,13 @@
 #include "Entity.h"
 #include "Utils.h"
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+#define ENTITY_AMOUNT 4
 #define FONT_SIZE 24
+#define INITIAL_UPWARD_VELOCITY (-360)
+
 int main(int argc, char* argv[])
 {
 	//Initialize SDL, and SDL_image. SDL_image is for loading images.
@@ -32,11 +38,13 @@ int main(int argc, char* argv[])
 
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	srand(time(NULL));
+
 
 
 	//RenderWindow is a combination of a renderer, and a window.
 	//RenderWindow.h also comes with functions that are helpful to display things on the screen.
-	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", 800, 600);
+	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	//Wood background.
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
@@ -50,43 +58,46 @@ int main(int argc, char* argv[])
 	}
 
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
-	Entity* entities = malloc(sizeof(Entity) * 4);
-	Entity* fontEntities = malloc(sizeof(Entity) * 4);
-
+	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+	Entity* fontEntities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+	const char* fontKey[ENTITY_AMOUNT] = {
+		getRandomChar(),
+		getRandomChar(),
+		getRandomChar(),
+		getRandomChar(),
+	};
 
 	//Things initialized inside braces, only exist inside braces.
 	{
-		srand(time(NULL));
+
 
 		//Load texture for every fruit.
-		SDL_Texture* textures[4] = {
+		SDL_Texture* textures[ENTITY_AMOUNT] = {
 			RenderWindow_loadTexture(window, "res/textures/watermelon.png"),
 			RenderWindow_loadTexture(window, "res/textures/coconut.png"),
 			RenderWindow_loadTexture(window, "res/textures/peach.png"),
 			RenderWindow_loadTexture(window, "res/textures/strawberry.png")
 		};
 
-		SDL_Texture* slicedTexture[4] = {
+		SDL_Texture* slicedTexture[ENTITY_AMOUNT] = {
 			RenderWindow_loadTexture(window, "res/textures/cut_watermelon.png"),
 			RenderWindow_loadTexture(window, "res/textures/cut_coconut.png"),
 			RenderWindow_loadTexture(window, "res/textures/cut_peach.png"),
 			RenderWindow_loadTexture(window,"res/textures/cut_strawberry.png"),
 		};
 
-
-
-		RenderImage* fontTexture[4] = {
-			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
-			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
-			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color),
-			RenderWindow_loadTextureFromFont(window, font, getRandomChar(), color)
+		RenderImage* fontTexture[ENTITY_AMOUNT] = {
+			RenderWindow_loadTextureFromFont(window, font, fontKey[0], color),
+			RenderWindow_loadTextureFromFont(window, font, fontKey[1], color),
+			RenderWindow_loadTextureFromFont(window, font, fontKey[2], color),
+			RenderWindow_loadTextureFromFont(window, font, fontKey[3], color)
 		};
 
 
 
 		//Initialize entity with required params, like position, size, etc.
 
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < ENTITY_AMOUNT; i++) {
 
 			entities[i] = (Entity) {
 				.position = {200 * (float) i, 800},
@@ -94,7 +105,8 @@ int main(int argc, char* argv[])
 				.viewRect = {0, 0, 450, 450},
 				.texture[UNSLICED] = textures[i],
 				.texture[SLICED] = slicedTexture[i],
-				.initialVelocity = {randomFloat() * 20, -360}
+				.initialVelocity = {randomFloat() * 20, -360},
+				.textureState = UNSLICED
 			};
 			fontEntities[i] = (Entity) {
 				.position = {
@@ -121,7 +133,6 @@ int main(int argc, char* argv[])
 	double accumulator = 0.0; // Used to execute statements until update according to frame time has been compensated.
 
 
-	int textureState = UNSLICED;
 
 	//Game loop.
 	while (gameRunning) {
@@ -136,13 +147,11 @@ int main(int argc, char* argv[])
 			while (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT)
 					gameRunning = false;
-				else if (event.type = SDL_KEYDOWN) {
-					switch (event.key.keysym.sym) {
-						case SDLK_UP:
-							textureState = SLICED;
-							break;
-						default:
-							break;
+				else if (event.type == SDL_KEYDOWN) {
+					for(int i = 0; i < ENTITY_AMOUNT; i++) {
+						if (event.key.keysym.sym == fontKey[i][0]) {
+							entities[i].textureState = SLICED;
+						}
 					}
 				}
 			}
@@ -151,13 +160,13 @@ int main(int argc, char* argv[])
 			RenderWindow_clear(window);
 			RenderWindow_render(window, backgroundTexture);
 
-			for(int i = 0; i < 4; i++) {
+			for(int i = 0; i < ENTITY_AMOUNT; i++) {
 				Entity_applyVelocity(&entities[i], &frameTime);
 				Entity_applyVelocity(&fontEntities[i], &frameTime);
 				Entity_applyGravity(&entities[i], 150, &t, &frameTime);
 				Entity_applyGravity(&fontEntities[i], 150, &t, &frameTime);
-				Entity_render(window, &entities[i], textureState);
-				Entity_render(window, &fontEntities[i], UNSLICED);
+				Entity_render(window, &entities[i]);
+				Entity_render(window, &fontEntities[i]);
 			}
 
 			accumulator -= stepTime;

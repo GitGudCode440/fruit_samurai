@@ -1,7 +1,7 @@
 #include "Entity.h"
 
 
-void Entity_render(const RenderWindow* renderWindow, const Entity* entity, enum TEXTURE_STATE state) {
+void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	SDL_Rect src;
 	src.x = entity->viewRect.x;
 	src.y = entity->viewRect.y;
@@ -13,7 +13,7 @@ void Entity_render(const RenderWindow* renderWindow, const Entity* entity, enum 
 	dest.y = (int) entity->position.y;
 	dest.w = entity->size.x;
 	dest.h = entity->size.y;
-	SDL_RenderCopy(renderWindow->renderer, entity->texture[state], &src, &dest);
+	SDL_RenderCopy(renderWindow->renderer, entity->texture[entity->textureState], &src, &dest);
 }
 
 void Entity_applyGravity(Entity* entity, const float gravity, const double* time, const double* deltaTime) {

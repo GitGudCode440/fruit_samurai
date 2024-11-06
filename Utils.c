@@ -11,7 +11,7 @@ float randomFloat() {
 }
 
 const char* getRandomChar() {
-	const char ch = (char) ((int) 'A' + (int) (randomFloat() * 26.0f));
+	const char ch = (char) ((int) 'a' + (int) (randomFloat() * 26.0f));
 	char* str =  malloc(sizeof(char) * 2);
 
 	if (str != NULL) {
