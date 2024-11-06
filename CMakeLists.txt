@@ -8,8 +8,8 @@ add_executable(fruit_samurai main.c
         RenderWindow.c
         Entity.h
         Entity.c
-        Vector2f.c
-        Vector2f.h
+        Math.c
+        Math.h
         Utils.h
         Utils.c
 )

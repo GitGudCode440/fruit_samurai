@@ -1,12 +1,12 @@
 #pragma once
 #include<SDL2/SDL.h>
 #include"RenderWindow.h"
-#include"Vector2f.h"
+#include"Math.h"
 
 typedef struct {
-	float x, y, z;
+	Vector2f position;
 	Vector2f initialVelocity;
-	int size;
+	Vector2i size;
 	SDL_Rect viewRect;
 	SDL_Texture* texture;
 } Entity;

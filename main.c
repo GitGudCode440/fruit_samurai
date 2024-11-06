@@ -8,7 +8,7 @@
 #include "Entity.h"
 #include "Utils.h"
 
-#define FONT_SIZE 32
+#define FONT_SIZE 24
 int main(int argc, char* argv[])
 {
 	//Initialize SDL, and SDL_image. SDL_image is for loading images.
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 
 	TTF_Font* font = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
-	const SDL_Color color = {252, 255, 255, 255};
+	const SDL_Color color = {0, 2, 36, 255};
 
 	if (font == NULL) {
 		printf("Failed to load font: %s\n", TTF_GetError());
@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
 	Entity* entities = malloc(sizeof(Entity) * 4);
 	Entity* fontEntities = malloc(sizeof(Entity) * 4);
+
 
 	//Things initialized inside braces, only exist inside braces.
 	{
@@ -78,17 +79,18 @@ int main(int argc, char* argv[])
 		for(int i = 0; i < 4; i++) {
 
 			entities[i] = (Entity) {
-				.x = 200 * (float) i,
-				.y = 800,
-				.size = 60,
+				.position = {200 * (float) i, 800},
+				.size = {60, 60},
 				.viewRect = {0, 0, 450, 450},
 				.texture = textures[i],
 				.initialVelocity = {randomFloat() * 20, -360}
 			};
 			fontEntities[i] = (Entity) {
-				.x = entities[i].x + (float) entities[i].size / 2 - (float) FONT_SIZE / 2,
-				.y = entities[i].y + (float) entities[i].size / 2 - (float) FONT_SIZE / 2,
-				.size = FONT_SIZE,
+				.position = {
+					entities[i].position.x + (float) entities[i].size.x / 2 - (float) FONT_SIZE / 2,
+					entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE /2
+				},
+				.size = {FONT_SIZE, FONT_SIZE * 2},
 				.viewRect = {0, 0, fontTexture[i]->width, fontTexture[i]->height},
 				.texture = fontTexture[i]->texture,
 				.initialVelocity = entities[i].initialVelocity
@@ -146,6 +148,7 @@ int main(int argc, char* argv[])
 	free(entities);
 	free(fontEntities);
 	RenderWindow_Destroy(window);
+	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
 	return 0;

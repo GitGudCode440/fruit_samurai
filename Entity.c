@@ -9,18 +9,18 @@ void Entity_render(const RenderWindow* renderWindow, const Entity* entity) {
 	src.h = entity->viewRect.h;
 
 	SDL_Rect dest;
-	dest.x = (int) entity->x;
-	dest.y = (int) entity->y;
-	dest.w = entity->size;
-	dest.h = entity->size;
+	dest.x = (int) entity->position.x;
+	dest.y = (int) entity->position.y;
+	dest.w = entity->size.x;
+	dest.h = entity->size.y;
 	SDL_RenderCopy(renderWindow->renderer, entity->texture, &src, &dest);
 }
 
 void Entity_applyGravity(Entity* entity, const float gravity, const double* time, const double* deltaTime) {
-	entity->y += gravity * (float) *time * (float) *deltaTime;
+	entity->position.y += gravity * (float) *time * (float) *deltaTime;
 }
 
 void Entity_applyVelocity(Entity* entity, const double* deltaTime) {
-	entity->x += entity->initialVelocity.x * (float) (*deltaTime);
-	entity->y += entity->initialVelocity.y * (float) (*deltaTime);
+	entity->position.x += entity->initialVelocity.x * (float) (*deltaTime);
+	entity->position.y += entity->initialVelocity.y * (float) (*deltaTime);
 }
