@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 				},
 				.size = {FONT_SIZE, FONT_SIZE * 2},
 				.viewRect = {0, 0, fontTexture[i]->width, fontTexture[i]->height},
-				.texture = fontTexture[i]->texture,
+				.texture[0] = fontTexture[i]->texture,
 				.initialVelocity = entities[i].initialVelocity
 			};
 
@@ -152,6 +152,7 @@ int main(int argc, char* argv[])
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
 						if (event.key.keysym.sym == fontKey[i][0]) {
 							entities[i].textureState = SLICED;
+							free(fontEntities[i].texture[0]);
 						}
 					}
 				}
