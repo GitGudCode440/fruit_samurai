@@ -206,6 +206,7 @@ int main(int argc, char* argv[])
 	RenderWindow_Destroy(window);
 	IMG_Quit();
 	TTF_Quit();
+	Mix_Quit();
 	SDL_Quit();
 	return 0;
 }
