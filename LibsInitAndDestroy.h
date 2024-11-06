@@ -4,5 +4,5 @@
 #include<SDL2/SDL_ttf.h>
 #include<SDL2/SDL_mixer.h>
 
-int libsInit();
-void libsDestroy();
+int LibsInit();
+void LibsDestroy();

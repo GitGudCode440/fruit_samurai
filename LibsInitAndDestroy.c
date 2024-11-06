@@ -33,7 +33,7 @@ int LibsInit() {
 
 }
 
-void libsDestroy() {
+void LibsDestroy() {
 	IMG_Quit();
 	TTF_Quit();
 	Mix_Quit();

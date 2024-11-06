@@ -21,7 +21,7 @@
 int main(int argc, char* argv[])
 {
 	//Initialize libraries.
-	if(!libsInit()) return 1;
+	if(LibsInit() != 0) return 1;
 
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 	RenderWindow_Destroy(window);
 
 	//Destroy libraries.
-	libsDestroy();
+	LibsDestroy();
 
 	return 0;
 }
