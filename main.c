@@ -153,8 +153,10 @@ int main(int argc, char* argv[])
 				else if (event.type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
 						if (event.key.keysym.sym == fontKey[i][0]) {
-							entities[i].textureState = SLICED;
-							free(fontEntities[i].texture[0]);
+
+								entities[i].textureState = SLICED;
+								fontEntities[i].texture[0] = NULL;
+
 						}
 					}
 				}
