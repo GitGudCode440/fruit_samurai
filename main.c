@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 			fontEntities[i] = (Entity) {
 				.position = {
 					entities[i].position.x + (float) entities[i].size.x / 2 - (float) FONT_SIZE / 2,
-					entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE /2
+					entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE
 				},
 				.size = {FONT_SIZE, FONT_SIZE * 2},
 				.viewRect = {0, 0, fontTexture[i]->width, fontTexture[i]->height},
