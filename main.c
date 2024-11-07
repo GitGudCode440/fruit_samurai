@@ -45,12 +45,16 @@ int main(int argc, char* argv[])
 	}
 
 	Mix_Music* backgroundMusic = Mix_LoadMUS("res/audio/Game-start.wav");
+	Mix_Chunk* fruitSliceSound = Mix_LoadWAV("res/audio/Splatter-Small-1.wav");
+	Mix_Chunk* sliceSound = Mix_LoadWAV("res/audio/Sword-swipe-7.wav");
 
-	if (backgroundMusic == NULL) {
+	if (backgroundMusic == NULL && fruitSliceSound == NULL) {
 		printf("Failed to load background music. Error: %s\n", Mix_GetError());
 	}
 
-	Mix_VolumeMusic(1);
+	Mix_VolumeMusic(8);
+	Mix_VolumeChunk(fruitSliceSound, 26);
+	Mix_VolumeChunk(sliceSound, 16);
 
 
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
@@ -102,7 +106,6 @@ int main(int argc, char* argv[])
 				.texture[UNSLICED] = textures[i],
 				.texture[SLICED] = slicedTexture[i],
 				.initialVelocity = {randomFloat() * 20, -360},
-				.textureState = UNSLICED
 			};
 			fontEntities[i] = (Entity) {
 				.position = {
@@ -152,11 +155,13 @@ int main(int argc, char* argv[])
 					gameRunning = false;
 				else if (event.type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
-						if (event.key.keysym.sym == fontKey[i][0]) {
-
-								entities[i].textureState = SLICED;
-								fontEntities[i].texture[0] = NULL;
-
+						if (event.key.keysym.sym == fontKey[i][0] && entities[i].textureState == UNSLICED) {
+							entities[i].textureState = SLICED;
+							Mix_PlayChannel(-1, fruitSliceSound, 0);
+							fontEntities[i].texture[0] = NULL;
+						}
+						else {
+							Mix_PlayChannel(-1, sliceSound, 0);
 						}
 					}
 				}
@@ -185,6 +190,8 @@ int main(int argc, char* argv[])
 
 	free(entities);
 	free(fontEntities);
+	free(fruitSliceSound);
+	free(sliceSound);
 	RenderWindow_Destroy(window);
 
 	//Destroy libraries.
