@@ -98,13 +98,13 @@ int main(int argc, char* argv[])
 		//Initialize entity with required params, like position, size, etc.
 
 		for(int i = 0; i < ENTITY_AMOUNT; i++) {
-
+			const int entityTextureRandomIndex = (int) (randomFloat() * 3.0f);
 			entities[i] = (Entity) {
 				.position = {200 * (float) i, 800},
 				.size = {60, 60},
 				.viewRect = {0, 0, 450, 450},
-				.texture[UNSLICED] = textures[i],
-				.texture[SLICED] = slicedTexture[i],
+				.texture[UNSLICED] = textures[entityTextureRandomIndex],
+				.texture[SLICED] = slicedTexture[entityTextureRandomIndex],
 				.initialVelocity = {randomFloat() * 20, -360},
 			};
 			fontEntities[i] = (Entity) {
