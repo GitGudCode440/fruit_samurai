@@ -9,14 +9,10 @@
 #include "Entity.h"
 #include "LibsInitAndDestroy.h"
 #include "Utils.h"
+#include "globals.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+const SDL_Color darkBlue = {0, 2, 36, 255};
 
-#define ENTITY_AMOUNT 4
-#define FONT_SIZE 24
-#define INITIAL_UPWARD_VELOCITY (-360)
-#define GRAVITY 150
 
 int main(int argc, char* argv[])
 {
@@ -36,11 +32,18 @@ int main(int argc, char* argv[])
 	//Wood background.
 	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 
-	TTF_Font* font = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
-	const SDL_Color color = {0, 2, 36, 255};
+	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
 
-	if (font == NULL) {
-		printf("Failed to load font: %s\n", TTF_GetError());
+	TTF_Font* brushKingFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE);
+	const SDL_Color white = {232, 244, 250, 255};
+
+	if (nunitoFont == NULL) {
+		printf("Failed to load nunitoFont: %s\n", TTF_GetError());
+		return 1;
+	}
+
+	if (brushKingFont == NULL) {
+		printf("Failed to load brushKingFont: %s\n", TTF_GetError());
 		return 1;
 	}
 
@@ -58,68 +61,38 @@ int main(int argc, char* argv[])
 
 
 	//Entities like watermelon, bananas, cherry, strawberry, etc.
-	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
-	Entity* fontEntities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
-	const char* fontKey[ENTITY_AMOUNT] = {
-		getRandomChar(),
-		getRandomChar(),
-		getRandomChar(),
-		getRandomChar(),
+
+
+
+	int scoreCounter = 0;
+
+	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, brushKingFont, "SCORE: 69", white);
+	Entity scoreEntity = {
+		.position = {WINDOW_WIDTH - scoreTexture->width - WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
+		.viewRect = {0, 0, scoreTexture->width, scoreTexture->height},
+		.size = {scoreTexture->width, scoreTexture->height},
+		.texture[0] = scoreTexture->texture
 	};
 
 	//Things initialized inside braces, only exist inside braces.
-	{
+
+	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+	generateEntity(window, &entities);
+
+	const char** fontKeys = getRandomUniqueCharArray();
+	Entity* fontEntities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+	generateFontEntity(window, entities, fontEntities, nunitoFont, fontKeys, darkBlue);
 
 
-		//Load texture for every fruit.
-		SDL_Texture* textures[ENTITY_AMOUNT] = {
-			RenderWindow_loadTexture(window, "res/textures/watermelon.png"),
-			RenderWindow_loadTexture(window, "res/textures/coconut.png"),
-			RenderWindow_loadTexture(window, "res/textures/peach.png"),
-			RenderWindow_loadTexture(window, "res/textures/strawberry.png")
-		};
-
-		SDL_Texture* slicedTexture[ENTITY_AMOUNT] = {
-			RenderWindow_loadTexture(window, "res/textures/cut_watermelon.png"),
-			RenderWindow_loadTexture(window, "res/textures/cut_coconut.png"),
-			RenderWindow_loadTexture(window, "res/textures/cut_peach.png"),
-			RenderWindow_loadTexture(window,"res/textures/cut_strawberry.png"),
-		};
-
-		RenderImage* fontTexture[ENTITY_AMOUNT] = {
-			RenderWindow_loadTextureFromFont(window, font, fontKey[0], color),
-			RenderWindow_loadTextureFromFont(window, font, fontKey[1], color),
-			RenderWindow_loadTextureFromFont(window, font, fontKey[2], color),
-			RenderWindow_loadTextureFromFont(window, font, fontKey[3], color)
-		};
-
-
-
-		//Initialize entity with required params, like position, size, etc.
-
-		for(int i = 0; i < ENTITY_AMOUNT; i++) {
-			const int entityTextureRandomIndex = (int) (randomFloat() * 3.0f);
-			entities[i] = (Entity) {
-				.position = {200 * (float) i, 800},
-				.size = {60, 60},
-				.viewRect = {0, 0, 450, 450},
-				.texture[UNSLICED] = textures[entityTextureRandomIndex],
-				.texture[SLICED] = slicedTexture[entityTextureRandomIndex],
-				.initialVelocity = {randomFloat() * 20, -360},
-			};
-			fontEntities[i] = (Entity) {
-				.position = {
-					entities[i].position.x + (float) entities[i].size.x / 2 - (float) FONT_SIZE / 2,
-					entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE
-				},
-				.size = {FONT_SIZE, FONT_SIZE * 2},
-				.viewRect = {0, 0, fontTexture[i]->width, fontTexture[i]->height},
-				.texture[0] = fontTexture[i]->texture,
-				.initialVelocity = entities[i].initialVelocity
-			};
-
-		}
+	if (entities == NULL) {
+		printf("What");
+		return 1;
 	}
+
+
+
+
+
 
 	bool gameRunning = true;
 
@@ -155,7 +128,7 @@ int main(int argc, char* argv[])
 					gameRunning = false;
 				else if (event.type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
-						if (event.key.keysym.sym == fontKey[i][0] && entities[i].textureState == UNSLICED) {
+						if (event.key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED) {
 							entities[i].textureState = SLICED;
 							Mix_PlayChannel(-1, fruitSliceSound, 0);
 							fontEntities[i].texture[0] = NULL;
@@ -192,6 +165,7 @@ int main(int argc, char* argv[])
 	free(fontEntities);
 	free(fruitSliceSound);
 	free(sliceSound);
+
 	RenderWindow_Destroy(window);
 
 	//Destroy libraries.
@@ -199,3 +173,6 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
+// RETURNS 1, IF ALLOCATING MEMORY FAILED
+
