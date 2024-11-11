@@ -42,6 +42,12 @@ void generateFontTextureArray(RenderImage** fontTextureArray, const RenderWindow
 
 void generateFontEntity(const RenderWindow*  window, const Entity* entities, Entity* fontEntities, TTF_Font* font, const char** fontKey, const SDL_Color color) {
 	RenderImage** fontTextures = malloc(sizeof(RenderImage) * ENTITY_AMOUNT);
+
+	if (fontTextures == NULL) {
+		return;
+	}
+
+
 	generateFontTextureArray(fontTextures, window, font, fontKey, color);
 
 	for (int i = 0; i < ENTITY_AMOUNT; i++) {
