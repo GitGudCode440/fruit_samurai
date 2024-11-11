@@ -36,9 +36,20 @@ static const char** getRandomUniqueCharArray() {
 		return NULL;
 	}
 
+
 	for (int i = 0; i < ENTITY_AMOUNT; i++) {
-		const char* strCh = getRandomChar();
-		charStrArr[i] = strCh;
+		bool isNotUnique = false;
+
+		do {
+			isNotUnique = false;
+			charStrArr[i] = getRandomChar();
+			for (int j = 0; j < i; j++) {
+				if(strcmp(charStrArr[i], charStrArr[j]) == 0) {
+					isNotUnique = true;
+					break;
+				}
+			}
+		} while (isNotUnique);
 
 	}
 

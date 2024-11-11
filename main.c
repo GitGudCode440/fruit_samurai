@@ -90,10 +90,6 @@ int main(int argc, char* argv[])
 	}
 
 
-
-
-
-
 	bool gameRunning = true;
 
 
@@ -163,6 +159,7 @@ int main(int argc, char* argv[])
 
 	free(entities);
 	free(fontEntities);
+	free(fontKeys);
 	free(fruitSliceSound);
 	free(sliceSound);
 
