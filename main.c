@@ -16,6 +16,7 @@ const SDL_Color darkBlue = {0, 2, 36, 255};
 
 int main(int argc, char* argv[])
 {
+	int timePositionOffset = WINDOW_HEIGHT + 3000;
 	//Initialize libraries.
 	if(LibsInit() != 0) return 1;
 
@@ -56,7 +57,7 @@ int main(int argc, char* argv[])
 	}
 
 	Mix_VolumeMusic(8);
-	Mix_VolumeChunk(fruitSliceSound, 26);
+	Mix_VolumeChunk(fruitSliceSound, 36);
 	Mix_VolumeChunk(sliceSound, 16);
 
 
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
 
 	int scoreCounter = 0;
 
-	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, brushKingFont, "SCORE: 69", white);
+	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, brushKingFont,  "SCORE: 69", white);
 	Entity scoreEntity = {
 		.position = {WINDOW_WIDTH - scoreTexture->width - WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
 		.viewRect = {0, 0, scoreTexture->width, scoreTexture->height},
@@ -77,17 +78,11 @@ int main(int argc, char* argv[])
 	//Things initialized inside braces, only exist inside braces.
 
 	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
-	generateEntity(window, &entities);
+	generateEntity(window, entities);
 
 	const char** fontKeys = getRandomUniqueCharArray();
 	Entity* fontEntities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
 	generateFontEntity(window, entities, fontEntities, nunitoFont, fontKeys, darkBlue);
-
-
-	if (entities == NULL) {
-		printf("What");
-		return 1;
-	}
 
 
 	bool gameRunning = true;
@@ -124,7 +119,8 @@ int main(int argc, char* argv[])
 					gameRunning = false;
 				else if (event.type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
-						if (event.key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED) {
+						//TODO: The third condition of if must be rewritten to account for future random upward velocity.
+						if (event.key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[0].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
 							entities[i].textureState = SLICED;
 							Mix_PlayChannel(-1, fruitSliceSound, 0);
 							fontEntities[i].texture[0] = NULL;
@@ -134,6 +130,24 @@ int main(int argc, char* argv[])
 						}
 					}
 				}
+			}
+
+			while(entities[0].position.y > WINDOW_HEIGHT + timePositionOffset) {
+				free(entities);
+				free(fontEntities);
+				free(fontKeys);
+
+				entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+				fontEntities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
+				fontKeys = getRandomUniqueCharArray();
+
+				generateEntity(window, entities);
+				generateFontEntity(window, entities, fontEntities, nunitoFont, fontKeys, darkBlue);
+
+				t = 0.0;
+				if (timePositionOffset > 0)
+					timePositionOffset -= 10;
+
 			}
 
 
@@ -147,6 +161,7 @@ int main(int argc, char* argv[])
 				Entity_applyGravity(&fontEntities[i], GRAVITY, &t, &frameTime);
 				Entity_render(window, &entities[i]);
 				Entity_render(window, &fontEntities[i]);
+				Entity_render(window, &scoreEntity);
 			}
 
 			accumulator -= stepTime;
@@ -170,6 +185,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-// RETURNS 1, IF ALLOCATING MEMORY FAILED
-

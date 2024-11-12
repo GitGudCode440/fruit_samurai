@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-void generateEntity(const RenderWindow* window, Entity** entities) {
+void generateEntity(const RenderWindow* window, Entity* entities) {
 	//Load texture for every fruit.
 	SDL_Texture* fruitTextures[4] = {
 		RenderWindow_loadTexture(window, "res/textures/fruits/watermelon.png"),
@@ -21,13 +21,13 @@ void generateEntity(const RenderWindow* window, Entity** entities) {
 
 	for(int i = 0; i < ENTITY_AMOUNT; i++) {
 		const int entityTextureRandomIndex = (int) (randomFloat() * 3);
-		(*entities)[i] = (Entity) {
+		entities[i] = (Entity) {
 			.position = {  WINDOW_WIDTH / ENTITY_AMOUNT * i, WINDOW_HEIGHT},
 			.size = {60, 60},
 			.viewRect = {0, 0, 450, 450},
 			.texture[UNSLICED] = fruitTextures[entityTextureRandomIndex],
 			.texture[SLICED] = slicedFruitTexture[entityTextureRandomIndex],
-			.initialVelocity = {randomFloat() * 20, -360},
+			.initialVelocity = {randomFloat() * 20, INITIAL_UPWARD_VELOCITY},
 		};
 
 	}
