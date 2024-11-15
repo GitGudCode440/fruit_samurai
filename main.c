@@ -185,6 +185,34 @@ int main(int argc, char* argv[])
 	free(fruitSliceSound);
 	free(sliceSound);
 
+	//Game Over Loop.
+	bool isGameOverRunning = true;
+	brushKingFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE * 3);
+	const RenderImage* gameOverFontImage = RenderWindow_loadTextureFromFont(window, brushKingFont,  "GAME OVER", white);
+	const Entity gameOverEntity = (Entity) {
+		.position = {
+			WINDOW_WIDTH / 2 - gameOverFontImage->width / 2,
+			WINDOW_HEIGHT / 2 - gameOverFontImage->height / 2,
+		},
+		.size = {gameOverFontImage->width, gameOverFontImage->height},
+		.viewRect = {0, 0, gameOverFontImage->width, gameOverFontImage->height},
+		.textureState = 0,
+		.texture[0] = gameOverFontImage->texture
+	};
+	while(isGameOverRunning)
+	{
+		while(SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+				isGameOverRunning = false;
+		}
+
+		RenderWindow_clear(window);
+		RenderWindow_render(window, backgroundTexture->texture);
+		Entity_render(window, &gameOverEntity);
+		RenderWindow_display(window);
+	}
+
 	RenderWindow_Destroy(window);
 
 	//Destroy libraries.
