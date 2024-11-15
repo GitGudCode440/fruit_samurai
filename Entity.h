@@ -11,6 +11,7 @@ enum TEXTURE_STATE {
 };
 
 typedef struct {
+	bool isBomb;
 	Vector2f position;
 	Vector2f initialVelocity;
 	Vector2i size;

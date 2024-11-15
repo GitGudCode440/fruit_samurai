@@ -29,16 +29,35 @@ void RenderWindow_Destroy(const RenderWindow* renderWindow) {
 	free((void*) renderWindow);
 }
 
-SDL_Texture* RenderWindow_loadTexture(const RenderWindow* renderWindow, const char* filepath) {
-	SDL_Texture* texture = NULL;
-	texture = IMG_LoadTexture(renderWindow->renderer, filepath);
+RenderImage* RenderWindow_loadTexture(const RenderWindow* renderWindow, const char* filepath) {
+	SDL_Surface* textureSurface = IMG_Load(filepath);
+
+	if (textureSurface == NULL) {
+		printf("Failed to load text surface: %s\n", TTF_GetError());
+		return NULL;
+	}
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderWindow->renderer, textureSurface);
+
 
 	if(texture == NULL) {
 		printf("Failed to get texture: %s\n", SDL_GetError());
 		return NULL;
 	}
 
-	return texture;
+	RenderImage* textureImage = malloc(sizeof(RenderImage));
+
+	if (!textureImage) {
+		printf("Failed to allocate for RenderImage\n");
+		return NULL;
+	}
+
+	textureImage->texture = texture;
+	textureImage->width = textureSurface->w;
+	textureImage->height = textureSurface->h;
+
+	free(textureSurface);
+	return textureImage;
 }
 
 RenderImage* RenderWindow_loadTextureFromFont(const RenderWindow* renderWindow, TTF_Font* font, const char* title, const SDL_Color color) {

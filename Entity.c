@@ -2,34 +2,42 @@
 
 void generateEntity(const RenderWindow* window, Entity* entities) {
 	//Load texture for every fruit.
-	SDL_Texture* fruitTextures[4] = {
+	RenderImage* fruitTextures[4] = {
 		RenderWindow_loadTexture(window, "res/textures/fruits/watermelon.png"),
 		RenderWindow_loadTexture(window, "res/textures/fruits/coconut.png"),
 		RenderWindow_loadTexture(window, "res/textures/fruits/peach.png"),
 		RenderWindow_loadTexture(window, "res/textures/fruits/strawberry.png")
 	};
 
-	SDL_Texture* slicedFruitTexture[4] = {
+	RenderImage* slicedFruitTexture[4] = {
 		RenderWindow_loadTexture(window, "res/textures/fruits/cut_watermelon.png"),
 		RenderWindow_loadTexture(window, "res/textures/fruits/cut_coconut.png"),
 		RenderWindow_loadTexture(window, "res/textures/fruits/cut_peach.png"),
 		RenderWindow_loadTexture(window,"res/textures/fruits/cut_strawberry.png"),
 	};
 
+	RenderImage* bomb = RenderWindow_loadTexture(window, "res/textures/bomb.png");
 
 	//Initialize entity with required params, like position, size, etc.
 
 	for(int i = 0; i < ENTITY_AMOUNT; i++) {
-		const int entityTextureRandomIndex = (int) (randomFloat() * 3);
+		const int entityTextureRandomIndex = (int) (randomFloat() * 3.9);
+		const float scale = 0.25f;
+		const bool isBomb = randomFloat() > 0.9;
+		const RenderImage* unslicedImage = isBomb ? bomb : fruitTextures[entityTextureRandomIndex];
 		entities[i] = (Entity) {
+			.isBomb = isBomb,
+			.textureState = UNSLICED,
 			.position = {  WINDOW_WIDTH / ENTITY_AMOUNT * i, WINDOW_HEIGHT},
-			.size = {60, 60},
-			.viewRect = {0, 0, 450, 450},
-			.texture[UNSLICED] = fruitTextures[entityTextureRandomIndex],
-			.texture[SLICED] = slicedFruitTexture[entityTextureRandomIndex],
+			.size = {
+				(int) ((float) unslicedImage->width * scale),
+				(int) ((float) unslicedImage->height * scale)
+			},
+			.viewRect = {0, 0, unslicedImage->width, unslicedImage->height},
+			.texture[UNSLICED] = unslicedImage->texture,
+			.texture[SLICED] = isBomb ? NULL : slicedFruitTexture[entityTextureRandomIndex]->texture,
 			.initialVelocity = {randomFloat() * 20, INITIAL_UPWARD_VELOCITY},
 		};
-
 	}
 
 }
@@ -52,13 +60,15 @@ void generateFontEntity(const RenderWindow*  window, const Entity* entities, Ent
 
 	for (int i = 0; i < ENTITY_AMOUNT; i++) {
 		fontEntities[i] = (Entity) {
+			.textureState = UNSLICED,
 			.position = {
 				entities[i].position.x + (float) entities[i].size.x / 2 - (float) FONT_SIZE / 2,
 				entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE
 			},
 			.size = {FONT_SIZE, FONT_SIZE * 2},
 			.viewRect = {0, 0, fontTextures[i]->width, fontTextures[i]->height},
-			.texture[0] = fontTextures[i]->texture,
+			.texture[UNSLICED] = fontTextures[i]->texture,
+			.texture[SLICED] = NULL,
 			.initialVelocity = entities[i].initialVelocity
 		};
 

@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	//Wood background.
-	SDL_Texture* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
+	RenderImage* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 
 	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
 
@@ -122,8 +122,15 @@ int main(int argc, char* argv[])
 						//TODO: The third condition of if must be rewritten to account for future random upward velocity.
 						if (event.key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[0].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
 							entities[i].textureState = SLICED;
+							fontEntities[i].textureState = SLICED;
+
+							if (entities[i].isBomb == true)
+							{
+								gameRunning = false;
+							}
+
 							Mix_PlayChannel(-1, fruitSliceSound, 0);
-							fontEntities[i].texture[0] = NULL;
+							scoreCounter += 10;
 						}
 						else {
 							Mix_PlayChannel(-1, sliceSound, 0);
@@ -152,7 +159,7 @@ int main(int argc, char* argv[])
 
 
 			RenderWindow_clear(window);
-			RenderWindow_render(window, backgroundTexture);
+			RenderWindow_render(window, backgroundTexture->texture);
 
 			for(int i = 0; i < ENTITY_AMOUNT; i++) {
 				Entity_applyVelocity(&entities[i], &frameTime);
