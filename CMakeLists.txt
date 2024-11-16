@@ -14,5 +14,7 @@ add_executable(fruit_samurai main.c
         LibsInitAndDestroy.c
         LibsInitAndDestroy.h
         globals.h
+        Game.c
+        Game.h
 )
 target_link_libraries(fruit_samurai -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer)
