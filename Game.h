@@ -13,6 +13,6 @@
 #include "globals.h"
 
 // RETUNS 0, IF SUCCESSFUL. OTHERWISE 1.
-int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent);
-int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent);
+int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd);
+int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd);
 

@@ -4,7 +4,7 @@ const SDL_Color white = {232, 244, 250, 255};
 const SDL_Color darkBlue = {0, 2, 36, 255};
 
 
-int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent)
+int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd)
 {
 	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE);
 	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
@@ -55,12 +55,18 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 	bool gameRunning = true;
 
+	//Showing black screen, before game starts.
+	RenderWindow_clear(window);
+	RenderWindow_display(window);
+
 
 	Mix_PlayMusic(backgroundMusic, 0);
 
 	while (Mix_PlayingMusic()) {}
 
 	Mix_FreeMusic(backgroundMusic);
+
+
 
 	int timePositionOffset = WINDOW_HEIGHT + 300;
 
@@ -80,11 +86,16 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 		accumulator += frameTime;
 
+
+
 		while (accumulator >= stepTime) {
 			//Listen to window being closed.
 			while (SDL_PollEvent(inputEvent)) {
 				if (inputEvent->type == SDL_QUIT)
+				{
 					gameRunning = false;
+					(*isGameEnd) = true;
+				}
 				else if (inputEvent->type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
 						//TODO: The third condition of if must be rewritten to account for future random upward velocity.
@@ -125,26 +136,31 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 			}
 
-
 			RenderWindow_clear(window);
-			RenderWindow_render(window, backgroundTexture->texture);
 
 			for(int i = 0; i < ENTITY_AMOUNT; i++) {
 				Entity_applyVelocity(&entities[i], &frameTime);
 				Entity_applyVelocity(&fontEntities[i], &frameTime);
 				Entity_applyGravity(&entities[i], GRAVITY, &t, &frameTime);
 				Entity_applyGravity(&fontEntities[i], GRAVITY, &t, &frameTime);
-				Entity_render(window, &entities[i]);
-				Entity_render(window, &fontEntities[i]);
-				Entity_render(window, &scoreEntity);
+
 			}
 
 			accumulator -= stepTime;
 			t += stepTime;
 		}
 
-		RenderWindow_display(window);
 
+		RenderWindow_render(window, backgroundTexture->texture);
+
+		for (int i = 0; i < ENTITY_AMOUNT; i++)
+		{
+			Entity_render(window, &entities[i]);
+			Entity_render(window, &fontEntities[i]);
+			Entity_render(window, &scoreEntity);
+		}
+
+		RenderWindow_display(window);
 	}
 
 	free(entities);
@@ -159,8 +175,10 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 }
 
-int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent)
+int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd)
 {
+	if ((*isGameEnd) == true) return 1;
+
 	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE * 3);
 
 	if (goodBrushFont == NULL)
@@ -183,10 +201,10 @@ int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 
 	goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE);
-	const RenderImage* gameOverMessage = RenderWindow_loadTextureFromFont(window, goodBrushFont, "CLOSE THE WINDOW, AND TRY AGAIN!", white);
+	const RenderImage* gameOverMessage = RenderWindow_loadTextureFromFont(window, goodBrushFont, "CLOSE THE WINDOW, OR PRESS R TO TRY AGAIN!", white);
 	const Entity gameOverMessageEntity = (Entity) {
 		.position = {
-			gameOverEntity.position.x,
+			gameOverEntity.position.x -  ((float) (gameOverMessage->width - gameOverFontImage->width) / 2),
 			gameOverEntity.position.y + FONT_SIZE * 3  + 16
 		},
 		.size = {gameOverMessage->width, gameOverMessage->height},
@@ -203,7 +221,18 @@ int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, S
 		while(SDL_PollEvent(inputEvent))
 		{
 			if (inputEvent->type == SDL_QUIT)
+			{
+				*isGameEnd = true;
 				isGameOverRunning = false;
+			}
+			else if (inputEvent->type == SDL_KEYDOWN)
+			{
+				if (inputEvent->key.keysym.sym == 'r')
+				{
+					*isGameEnd = false;
+					isGameOverRunning = false;
+				}
+			}
 		}
 
 		RenderWindow_clear(window);

@@ -24,16 +24,20 @@ int main(int argc, char* argv[])
 	srand(time(NULL));
 
 
-
 	//RenderWindow is a combination of a renderer, and a window.
 	//RenderWindow.h also comes with functions that are helpful to display things on the screen.
 	const RenderWindow* window = RenderWindow_Init("Fruit Samurai: A Typing Madness", WINDOW_WIDTH, WINDOW_HEIGHT);
 	const RenderImage* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 	SDL_Event event;
 
-
-	MainGame(window, backgroundTexture, &event);
-	GameOver(window, backgroundTexture, &event);
+	bool isGameEnd;
+	do
+	{
+		isGameEnd = false;
+		MainGame(window, backgroundTexture, &event, &isGameEnd);
+		GameOver(window, backgroundTexture, &event, &isGameEnd);
+	}
+	while (!isGameEnd);
 
 
 
