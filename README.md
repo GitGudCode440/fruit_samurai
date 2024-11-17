@@ -7,8 +7,15 @@
 ![readme_flex](https://github.com/user-attachments/assets/62b6b139-6409-42e9-9864-5e353f3cf743)
 
 ### Using the Project.
-1. Clone the project using git.
-2. Open the directory using CLion.
+1. Fork the GitHub repository by clicking on the Fork button on the top-right hand corner.
+2. Clone the forked repository using `git clone` in your machine. And open the `fruit_samurai` project in CLion.
 3. Set the working directory of the build by clicking on drop-down of `fruit_samurai` near the right-hand corner.
 4. Click on Edit Configurations
 5. Set the working directory to where the project is placed.
+6. Run the project :)
+
+### Contributing to the Project.
+1. After making some changes, commit your code to your forked GitHub repository.
+2. When commited to the repo, click on the `Compare & Pull Request`.
+3. Give the change a title, and description about what it does.
+4. After review, the code will be merged into the main repo.
