@@ -98,8 +98,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 				}
 				else if (inputEvent->type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
-						//TODO: The third condition of if must be rewritten to account for future random upward velocity.
-						if (inputEvent->key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[0].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
+						if (inputEvent->key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[i].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
 							entities[i].textureState = SLICED;
 							fontEntities[i].textureState = SLICED;
 
