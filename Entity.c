@@ -36,7 +36,7 @@ void generateEntity(const RenderWindow* window, Entity* entities) {
 			.viewRect = {0, 0, unslicedImage->width, unslicedImage->height},
 			.texture[UNSLICED] = unslicedImage->texture,
 			.texture[SLICED] = isBomb ? NULL : slicedFruitTexture[entityTextureRandomIndex]->texture,
-			.initialVelocity = {randomFloat() * 20, INITIAL_UPWARD_VELOCITY},
+			.initialVelocity = {randomFloat() * 20, INITIAL_UPWARD_VELOCITY - randomFloat() * 20},
 		};
 	}
 
@@ -75,6 +75,17 @@ void generateFontEntity(const RenderWindow*  window, const Entity* entities, Ent
 	}
 
 	free(fontTextures);
+
+}
+
+void generateScoreEntity(const RenderWindow* window, Entity* entity, const RenderImage* scoreTexture)
+{
+	*entity = (Entity) {
+		.position = {WINDOW_WIDTH - scoreTexture->width - WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
+		.viewRect = {0, 0, scoreTexture->width, scoreTexture->height},
+		.size = {scoreTexture->width, scoreTexture->height},
+		.texture[0] = scoreTexture->texture
+	};
 
 }
 

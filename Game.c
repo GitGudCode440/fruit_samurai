@@ -3,9 +3,84 @@
 const SDL_Color white = {232, 244, 250, 255};
 const SDL_Color darkBlue = {0, 2, 36, 255};
 
+int StartMenu(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isStartMenuEnd)
+{
+	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE * 3);
+	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
+
+	if (goodBrushFont == NULL && nunitoFont == NULL)
+	{
+		printf("GOOD BRUSH FONT OR NUNITO FONT HAVE NOT LOADED\n");
+	}
+
+	Mix_Music* backgroundMusic = Mix_LoadMUS("res/audio/typing-ninja-soundtrack.wav");
+
+	if (backgroundMusic == NULL)
+	{
+		printf("Failed to load background music: Error: %s\n", Mix_GetError());
+	}
+
+	Mix_VolumeMusic(16);
+	Mix_PlayMusic(backgroundMusic, 0);
+
+	const RenderImage* titleTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont, "TYPING NINJA!", white);
+	const RenderImage* subtitleTexture = RenderWindow_loadTextureFromFont(window, nunitoFont, "PRESS ENTER TO CONTINUE!", white);
+
+	const Entity titleEntity = (Entity) {
+		.position = {WINDOW_WIDTH / 2 - titleTexture->width / 2, WINDOW_HEIGHT / 2 - titleTexture->height /2},
+		.size = {titleTexture->width, titleTexture->height},
+		.viewRect = {0, 0, titleTexture->width, titleTexture->height},
+		.texture[0] = {titleTexture->texture},
+		.textureState = 0
+	};
+
+	const Entity subtitleEntity = (Entity) {
+		.position = {titleEntity.position.x - (subtitleTexture->width - titleTexture->width) / 2, titleEntity.position.y + titleTexture->height +  subtitleTexture->height},
+		.size = {subtitleTexture->width, subtitleTexture->height},
+		.viewRect = {0, 0, subtitleTexture->width, subtitleTexture->width},
+		.texture[0] = {subtitleTexture->texture},
+		.textureState = 0
+	};
+
+	bool isMainMenuRunning = true;
+
+	while(isMainMenuRunning)
+	{
+		while(SDL_PollEvent(inputEvent))
+		{
+			if(inputEvent->type == SDL_QUIT)
+			{
+				isMainMenuRunning = false;
+				*isStartMenuEnd = true;
+			}
+			else if (inputEvent->type == SDL_KEYDOWN)
+			{
+				if (inputEvent->key.keysym.sym == SDLK_RETURN)
+				{
+					isMainMenuRunning = false;
+
+				}
+			}
+		}
+
+		RenderWindow_clear(window);
+		RenderWindow_render(window, backgroundTexture->texture);
+		Entity_render(window, &titleEntity);
+		Entity_render(window, &subtitleEntity);
+		RenderWindow_display(window);
+	}
+
+
+	Mix_HaltMusic();
+	Mix_FreeMusic(backgroundMusic);
+
+	return 0;
+}
 
 int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd)
 {
+
+	if (*isGameEnd == true) return 0;
 	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE);
 	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
 
@@ -23,27 +98,23 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 	Mix_Music* backgroundMusic = Mix_LoadMUS("res/audio/Game-start.wav");
 	Mix_Chunk* fruitSliceSound = Mix_LoadWAV("res/audio/Splatter-Small-1.wav");
 	Mix_Chunk* sliceSound = Mix_LoadWAV("res/audio/Sword-swipe-7.wav");
+	Mix_Chunk* bombExplodeSound = Mix_LoadWAV("res/audio/Bomb-explode.wav");
 
 	if (backgroundMusic == NULL && fruitSliceSound == NULL) {
 		printf("Failed to load background music. Error: %s\n", Mix_GetError());
 	}
 
 	Mix_VolumeMusic(8);
+	Mix_VolumeChunk(bombExplodeSound, 36);
 	Mix_VolumeChunk(fruitSliceSound, 36);
 	Mix_VolumeChunk(sliceSound, 16);
 
 
 	int scoreCounter = 0;
+	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont,  "SCORE: 0", white);
+	Entity* scoreEntity = malloc(sizeof(Entity));
+	generateScoreEntity(window, scoreEntity, scoreTexture);
 
-	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont,  "SCORE: 69", white);
-	const Entity scoreEntity = {
-		.position = {WINDOW_WIDTH - scoreTexture->width - WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
-		.viewRect = {0, 0, scoreTexture->width, scoreTexture->height},
-		.size = {scoreTexture->width, scoreTexture->height},
-		.texture[0] = scoreTexture->texture
-	};
-
-	//Things initialized inside braces, only exist inside braces.
 
 	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
 	generateEntity(window, entities);
@@ -99,16 +170,27 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 				else if (inputEvent->type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
 						if (inputEvent->key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[i].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
+							char scoreCounterStr[50];
 							entities[i].textureState = SLICED;
 							fontEntities[i].textureState = SLICED;
 
 							if (entities[i].isBomb == true)
 							{
+								Mix_PlayChannel(-1, bombExplodeSound, 0);
 								gameRunning = false;
 							}
 
 							Mix_PlayChannel(-1, fruitSliceSound, 0);
 							scoreCounter += 10;
+
+							//Updating Score UI
+							convertIntegerToString(scoreCounterStr, scoreCounter);
+							free(scoreTexture);
+							char* result = stringConcatenate("SCORE: ", scoreCounterStr);
+							scoreTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont, result, white);
+							free(result);
+							generateScoreEntity(window, scoreEntity, scoreTexture);
+
 						}
 						else {
 							Mix_PlayChannel(-1, sliceSound, 0);
@@ -147,6 +229,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 			accumulator -= stepTime;
 			t += stepTime;
+
 		}
 
 
@@ -156,7 +239,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 		{
 			Entity_render(window, &entities[i]);
 			Entity_render(window, &fontEntities[i]);
-			Entity_render(window, &scoreEntity);
+			Entity_render(window, scoreEntity);
 		}
 
 		RenderWindow_display(window);
@@ -165,14 +248,13 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 	free(entities);
 	free(fontEntities);
 	free(fontKeys);
-	free(fruitSliceSound);
-	free(sliceSound);
-	free(nunitoFont);
-	free(goodBrushFont);
+
 
 	return 0;
 
 }
+
+
 
 int GameOver(const RenderWindow* window, const RenderImage* backgroundTexture, SDL_Event* inputEvent, bool* isGameEnd)
 {

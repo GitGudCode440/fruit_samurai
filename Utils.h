@@ -55,3 +55,29 @@ static const char** getRandomUniqueCharArray() {
 
 	return charStrArr;
 }
+
+static const char* convertIntegerToString(char* buffer, const int num)
+{
+	snprintf(buffer, sizeof(buffer), "%d", num);
+	return buffer;
+}
+
+static char* stringConcatenate(const char* str1, const char* str2) {
+
+	size_t len1 = strlen(str1);
+	size_t len2 = strlen(str2);
+	size_t total_len = len1 + len2 + 1;
+
+
+	char* result = (char*)malloc(total_len);
+	if (result == NULL) {
+		printf("Failed to allocate memory!\n");
+		return NULL;
+	}
+
+
+	strcpy(result, str1);
+	strcat(result, str2);
+
+	return result;
+}

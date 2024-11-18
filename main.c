@@ -26,7 +26,16 @@ int main(int argc, char* argv[])
 	const RenderImage* backgroundTexture = RenderWindow_loadTexture(window, "res/textures/background.png");
 	SDL_Event event;
 
-	bool isGameEnd;
+	bool isGameEnd = false;
+	bool isStartMenuClosed = false;
+	StartMenu(window, backgroundTexture, &event, &isStartMenuClosed);
+
+	if (isStartMenuClosed)
+	{
+		LibsDestroy();
+		return 0;
+	};
+
 	do
 	{
 		isGameEnd = false;
