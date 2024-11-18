@@ -99,6 +99,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 	Mix_Chunk* fruitSliceSound = Mix_LoadWAV("res/audio/Splatter-Small-1.wav");
 	Mix_Chunk* sliceSound = Mix_LoadWAV("res/audio/Sword-swipe-7.wav");
 	Mix_Chunk* bombExplodeSound = Mix_LoadWAV("res/audio/Bomb-explode.wav");
+	Mix_Chunk* wrongBuzzerSound = Mix_LoadWAV("res/audio/fruit_miss.wav");
 
 	if (backgroundMusic == NULL && fruitSliceSound == NULL) {
 		printf("Failed to load background music. Error: %s\n", Mix_GetError());
@@ -107,13 +108,20 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 	Mix_VolumeMusic(8);
 	Mix_VolumeChunk(bombExplodeSound, 36);
 	Mix_VolumeChunk(fruitSliceSound, 36);
+	Mix_VolumeChunk(wrongBuzzerSound, 16);
 	Mix_VolumeChunk(sliceSound, 16);
 
+
+	int fruitsMissed = 0;
+	RenderImage* crossUnmarked = RenderWindow_loadTexture(window, "res/textures/cross_empty.png");
+	RenderImage* crossMarked = RenderWindow_loadTexture(window, "res/textures/cross_full.png");
+	Entity* crossEntities = malloc(sizeof(Entity) * MAX_FRUITS_MISSES_ALLOWED);
+	generateCrossEntities(crossEntities, crossUnmarked, crossMarked);
 
 	int scoreCounter = 0;
 	RenderImage* scoreTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont,  "SCORE: 0", white);
 	Entity* scoreEntity = malloc(sizeof(Entity));
-	generateScoreEntity(window, scoreEntity, scoreTexture);
+	generateScoreEntity(scoreEntity, scoreTexture);
 
 
 	Entity* entities = malloc(sizeof(Entity) * ENTITY_AMOUNT);
@@ -169,10 +177,10 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 				}
 				else if (inputEvent->type == SDL_KEYDOWN) {
 					for(int i = 0; i < ENTITY_AMOUNT; i++) {
-						if (inputEvent->key.keysym.sym == fontKeys[i][0] && entities[i].textureState == UNSLICED && entities[i].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
+						if (inputEvent->key.keysym.sym == fontKeys[i][0] && entities[i].textureState == INITIAL && entities[i].position.y < WINDOW_HEIGHT + WINDOW_BORDER_PADDING) {
 							char scoreCounterStr[50];
-							entities[i].textureState = SLICED;
-							fontEntities[i].textureState = SLICED;
+							entities[i].textureState = FINAL;
+							fontEntities[i].textureState = FINAL;
 
 							if (entities[i].isBomb == true)
 							{
@@ -189,13 +197,30 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 							char* result = stringConcatenate("SCORE: ", scoreCounterStr);
 							scoreTexture = RenderWindow_loadTextureFromFont(window, goodBrushFont, result, white);
 							free(result);
-							generateScoreEntity(window, scoreEntity, scoreTexture);
+							generateScoreEntity(scoreEntity, scoreTexture);
 
 						}
 						else {
 							Mix_PlayChannel(-1, sliceSound, 0);
 						}
 					}
+				}
+			}
+
+			//For updating the value of fruitsMissed.
+			for(int i = 0; i < ENTITY_AMOUNT; i++)
+			{
+				if (
+					entities[i].textureState == INITIAL &&
+					entities[i].position.y > WINDOW_HEIGHT + WINDOW_BORDER_PADDING &&
+					entities[i].isBomb == false
+					)
+				{
+					crossEntities[fruitsMissed].textureState = FINAL;
+					if (fruitsMissed < MAX_FRUITS_MISSES_ALLOWED) fruitsMissed++;
+					entities[i].textureState = FINAL;
+					Mix_PlayChannel(-1, wrongBuzzerSound, 0);
+					printf("FRUITS MISSED: %d\n", fruitsMissed);
 				}
 			}
 
@@ -227,12 +252,20 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 			}
 
+
+			if (fruitsMissed == MAX_FRUITS_MISSES_ALLOWED)
+			{
+				gameRunning = false;
+			}
+
+
 			accumulator -= stepTime;
 			t += stepTime;
 
 		}
 
 
+		//Render loop.
 		RenderWindow_render(window, backgroundTexture->texture);
 
 		for (int i = 0; i < ENTITY_AMOUNT; i++)
@@ -240,13 +273,21 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 			Entity_render(window, &entities[i]);
 			Entity_render(window, &fontEntities[i]);
 			Entity_render(window, scoreEntity);
+
 		}
+
+		for (int i = 0; i < MAX_FRUITS_MISSES_ALLOWED; i++)
+		{
+			Entity_render(window, &crossEntities[i]);
+		}
+
 
 		RenderWindow_display(window);
 	}
 
 	free(entities);
 	free(fontEntities);
+	free(crossEntities);
 	free(fontKeys);
 
 

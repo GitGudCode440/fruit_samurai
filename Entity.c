@@ -27,15 +27,15 @@ void generateEntity(const RenderWindow* window, Entity* entities) {
 		const RenderImage* unslicedImage = isBomb ? bomb : fruitTextures[entityTextureRandomIndex];
 		entities[i] = (Entity) {
 			.isBomb = isBomb,
-			.textureState = UNSLICED,
+			.textureState = INITIAL,
 			.position = {  WINDOW_WIDTH / ENTITY_AMOUNT * i, WINDOW_HEIGHT},
 			.size = {
 				(int) ((float) unslicedImage->width * scale),
 				(int) ((float) unslicedImage->height * scale)
 			},
 			.viewRect = {0, 0, unslicedImage->width, unslicedImage->height},
-			.texture[UNSLICED] = unslicedImage->texture,
-			.texture[SLICED] = isBomb ? NULL : slicedFruitTexture[entityTextureRandomIndex]->texture,
+			.texture[INITIAL] = unslicedImage->texture,
+			.texture[FINAL] = isBomb ? NULL : slicedFruitTexture[entityTextureRandomIndex]->texture,
 			.initialVelocity = {randomFloat() * 20, INITIAL_UPWARD_VELOCITY - randomFloat() * 20},
 		};
 	}
@@ -60,15 +60,15 @@ void generateFontEntity(const RenderWindow*  window, const Entity* entities, Ent
 
 	for (int i = 0; i < ENTITY_AMOUNT; i++) {
 		fontEntities[i] = (Entity) {
-			.textureState = UNSLICED,
+			.textureState = INITIAL,
 			.position = {
 				entities[i].position.x + (float) entities[i].size.x / 2 - (float) FONT_SIZE / 2,
 				entities[i].position.y + (float) entities[i].size.y / 2 - (float) FONT_SIZE
 			},
 			.size = {FONT_SIZE, FONT_SIZE * 2},
 			.viewRect = {0, 0, fontTextures[i]->width, fontTextures[i]->height},
-			.texture[UNSLICED] = fontTextures[i]->texture,
-			.texture[SLICED] = NULL,
+			.texture[INITIAL] = fontTextures[i]->texture,
+			.texture[FINAL] = NULL,
 			.initialVelocity = entities[i].initialVelocity
 		};
 
@@ -78,15 +78,32 @@ void generateFontEntity(const RenderWindow*  window, const Entity* entities, Ent
 
 }
 
-void generateScoreEntity(const RenderWindow* window, Entity* entity, const RenderImage* scoreTexture)
+void generateScoreEntity(Entity* entity, const RenderImage* scoreTexture)
 {
 	*entity = (Entity) {
 		.position = {WINDOW_WIDTH - scoreTexture->width - WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
 		.viewRect = {0, 0, scoreTexture->width, scoreTexture->height},
 		.size = {scoreTexture->width, scoreTexture->height},
-		.texture[0] = scoreTexture->texture
+		.texture[INITIAL] = scoreTexture->texture
 	};
 
+}
+
+void generateCrossEntities(Entity* entity, RenderImage* initialCrossImage, RenderImage* finalCrossImage)
+{
+
+	for(int i = 0; i < MAX_FRUITS_MISSES_ALLOWED; i++)
+	{
+		const float scale = 0.5f;
+		entity[i] = (Entity) {
+			.position = {i * initialCrossImage->width * scale + WINDOW_BORDER_PADDING, WINDOW_BORDER_PADDING},
+			.viewRect = {0, 0, initialCrossImage->width, initialCrossImage->height},
+			.size = {initialCrossImage->width * scale, initialCrossImage->height * scale},
+			.texture[INITIAL] = initialCrossImage->texture,
+			.texture[FINAL] = finalCrossImage->texture,
+			.textureState = INITIAL
+		};
+	}
 }
 
 
