@@ -81,7 +81,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 {
 
 	if (*isGameEnd == true) return 0;
-	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE);
+	TTF_Font* goodBrushFont = TTF_OpenFont("res/fonts/Good_Brush.ttf", FONT_SIZE * 1.2);
 	TTF_Font* nunitoFont = TTF_OpenFont("res/fonts/Nunito-SemiBold.ttf", FONT_SIZE);
 
 
@@ -96,10 +96,23 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 	}
 
 	Mix_Music* backgroundMusic = Mix_LoadMUS("res/audio/Game-start.wav");
-	Mix_Chunk* fruitSliceSound = Mix_LoadWAV("res/audio/Splatter-Small-1.wav");
-	Mix_Chunk* sliceSound = Mix_LoadWAV("res/audio/Sword-swipe-7.wav");
+
 	Mix_Chunk* bombExplodeSound = Mix_LoadWAV("res/audio/Bomb-explode.wav");
 	Mix_Chunk* wrongBuzzerSound = Mix_LoadWAV("res/audio/fruit_miss.wav");
+
+	Mix_Chunk* fruitSliceSound[2] = {
+		Mix_LoadWAV("res/audio/Splatter-Small-1.wav"),
+		Mix_LoadWAV("res/audio/Splatter-Small-2.wav")
+	};
+	Mix_Chunk* sliceSound[7] = {
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-1.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-2.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-3.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-4.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-5.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-6.wav"),
+		Mix_LoadWAV("res/audio/sliceSounds/Sword-swipe-7.wav"),
+	};
 
 	if (backgroundMusic == NULL && fruitSliceSound == NULL) {
 		printf("Failed to load background music. Error: %s\n", Mix_GetError());
@@ -107,9 +120,10 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 
 	Mix_VolumeMusic(8);
 	Mix_VolumeChunk(bombExplodeSound, 36);
-	Mix_VolumeChunk(fruitSliceSound, 36);
 	Mix_VolumeChunk(wrongBuzzerSound, 16);
-	Mix_VolumeChunk(sliceSound, 16);
+
+	for(int i = 0; i < 7; i++) Mix_VolumeChunk(sliceSound[i], 10);
+	for(int i = 0; i < 2; i++) Mix_VolumeChunk(fruitSliceSound[i], 16);
 
 
 	int fruitsMissed = 0;
@@ -166,7 +180,6 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 		accumulator += frameTime;
 
 
-
 		while (accumulator >= stepTime) {
 			//Listen to window being closed.
 			while (SDL_PollEvent(inputEvent)) {
@@ -188,7 +201,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 								gameRunning = false;
 							}
 
-							Mix_PlayChannel(-1, fruitSliceSound, 0);
+							Mix_PlayChannel(-1, fruitSliceSound[(int) randomFloat()], 0);
 							scoreCounter += 10;
 
 							//Updating Score UI
@@ -200,9 +213,7 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 							generateScoreEntity(scoreEntity, scoreTexture);
 
 						}
-						else {
-							Mix_PlayChannel(-1, sliceSound, 0);
-						}
+						else Mix_PlayChannel(-1, sliceSound[(int) (randomFloat() * 6)], 0);
 					}
 				}
 			}
@@ -220,7 +231,6 @@ int MainGame(const RenderWindow* window, const RenderImage* backgroundTexture, S
 					if (fruitsMissed < MAX_FRUITS_MISSES_ALLOWED) fruitsMissed++;
 					entities[i].textureState = FINAL;
 					Mix_PlayChannel(-1, wrongBuzzerSound, 0);
-					printf("FRUITS MISSED: %d\n", fruitsMissed);
 				}
 			}
 

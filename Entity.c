@@ -16,7 +16,7 @@ void generateEntity(const RenderWindow* window, Entity* entities) {
 		RenderWindow_loadTexture(window,"res/textures/fruits/cut_strawberry.png"),
 	};
 
-	RenderImage* bomb = RenderWindow_loadTexture(window, "res/textures/bomb.png");
+	const RenderImage* bomb = RenderWindow_loadTexture(window, "res/textures/bomb.png");
 
 	//Initialize entity with required params, like position, size, etc.
 
@@ -28,7 +28,7 @@ void generateEntity(const RenderWindow* window, Entity* entities) {
 		entities[i] = (Entity) {
 			.isBomb = isBomb,
 			.textureState = INITIAL,
-			.position = {  WINDOW_WIDTH / ENTITY_AMOUNT * i, WINDOW_HEIGHT},
+			.position = {  WINDOW_WIDTH / ENTITY_AMOUNT * i + WINDOW_BORDER_PADDING * 2, WINDOW_HEIGHT},
 			.size = {
 				(int) ((float) unslicedImage->width * scale),
 				(int) ((float) unslicedImage->height * scale)
@@ -89,7 +89,7 @@ void generateScoreEntity(Entity* entity, const RenderImage* scoreTexture)
 
 }
 
-void generateCrossEntities(Entity* entity, RenderImage* initialCrossImage, RenderImage* finalCrossImage)
+void generateCrossEntities(Entity* entity, const RenderImage* initialCrossImage, const RenderImage* finalCrossImage)
 {
 
 	for(int i = 0; i < MAX_FRUITS_MISSES_ALLOWED; i++)

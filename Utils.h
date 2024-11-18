@@ -64,9 +64,9 @@ static const char* convertIntegerToString(char* buffer, const int num)
 
 static char* stringConcatenate(const char* str1, const char* str2) {
 
-	size_t len1 = strlen(str1);
-	size_t len2 = strlen(str2);
-	size_t total_len = len1 + len2 + 1;
+	const size_t len1 = strlen(str1);
+	const size_t len2 = strlen(str2);
+	const size_t total_len = len1 + len2 + 1;
 
 
 	char* result = (char*)malloc(total_len);
@@ -81,3 +81,5 @@ static char* stringConcatenate(const char* str1, const char* str2) {
 
 	return result;
 }
+
+
