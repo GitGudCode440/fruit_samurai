@@ -1,4 +1,4 @@
-# Fruit Samurai
+# Typing Ninja
 ### A game made for PF's Uni Final Project | Made in SDL2 and C. No C++
 
 > [!Note]
