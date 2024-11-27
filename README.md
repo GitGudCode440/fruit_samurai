@@ -4,7 +4,8 @@
 > [!Note]
 > The project is made using CLion, natively on Linux. As a result, working directory and other settings configured by the IDE may not work on Windows.
 
-![readme_flex](https://github.com/user-attachments/assets/62b6b139-6409-42e9-9864-5e353f3cf743)
+![Screenshot_20241128_003016](https://github.com/user-attachments/assets/0bad5baf-7e4d-47ca-bedc-854c52bf543a)
+
 
 ### Using the Project.
 1. Fork the GitHub repository by clicking on the Fork button on the top-right hand corner.
